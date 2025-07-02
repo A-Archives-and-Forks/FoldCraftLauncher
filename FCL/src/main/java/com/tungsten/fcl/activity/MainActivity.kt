@@ -22,6 +22,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.content.edit
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.forEach
 import androidx.core.view.postDelayed
@@ -221,7 +222,14 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
                         true
                     }
                     UpdateChecker.getInstance().checkAuto(this@MainActivity).start()
-                    if (!checkNotificationPermission()) {
+                    if (!checkNotificationPermission() && getSharedPreferences(
+                            "launcher",
+                            MODE_PRIVATE
+                        ).getBoolean("check_notification_permission", true)
+                    ) {
+                        getSharedPreferences("launcher", MODE_PRIVATE).edit {
+                            putBoolean("check_notification_permission", false)
+                        }
                         FCLAlertDialog.Builder(this@MainActivity)
                             .setMessage(getString(R.string.notification_permission))
                             .setPositiveButton {
@@ -255,9 +263,6 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
         }
         permissionResultLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-                if (it) {
-
-                }
             }
     }
 
@@ -668,7 +673,11 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
     }
 
     private fun requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || !ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || !ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+        ) {
             try {
                 val intent = Intent()
                 intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
