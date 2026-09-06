@@ -141,7 +141,7 @@ public class GameMenu implements MenuCallback, FCLBridgeCallback {
 
     private TouchController touchController;
 
-    private boolean gamepadDisabled = false;
+    private boolean gamepadControl = true;
     private Thread fpsThread;
     private Thread memoryThread;
     private int lastCursorMode = FCLBridge.CursorEnabled;
@@ -303,12 +303,14 @@ public class GameMenu implements MenuCallback, FCLBridgeCallback {
         return viewGroupProperty.get();
     }
 
-    public boolean isGamepadDisabled() {
-        return gamepadDisabled;
+    public boolean isGamepadControl() {
+        return gamepadControl;
     }
 
-    public void setGamepadDisabled(boolean gamepadDisabled) {
-        this.gamepadDisabled = gamepadDisabled;
+    public void setGamepadControl(boolean gamepadControl) {
+        this.gamepadControl = gamepadControl;
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("launcher", MODE_PRIVATE);
+        sharedPreferences.edit().putBoolean("gamepad_control", gamepadControl).apply();
     }
 
     private void initLeftMenu() {
@@ -472,6 +474,7 @@ public class GameMenu implements MenuCallback, FCLBridgeCallback {
         this.activity = activity;
         this.fclBridge = fclBridge;
         this.simulated = fclBridge == null;
+        this.gamepadControl = activity.getSharedPreferences("launcher", MODE_PRIVATE).getBoolean("gamepad_control", true);
         this.fclInput = new FCLInput(this);
         if (!Controllers.isInitialized()) {
             Controllers.init();
@@ -944,8 +947,10 @@ public class GameMenu implements MenuCallback, FCLBridgeCallback {
             case PHYSICAL_MOUSE:
                 menuSetting.setPhysicalMouseMode(checked);
                 break;
-            case DISABLE_GAMEPAD_MAPPING:
-                gamepadDisabled = checked;
+            case GAMEPAD_CONTROL:
+                setGamepadControl(checked);
+                // 联动刷新：手柄关闭时输入模式选择器禁用
+                rightMenuAdapter.rebuild();
                 break;
             case PERFORMANCE_MODE:
                 menuSetting.setPerformanceMode(checked);

@@ -35,4 +35,18 @@ object SdlSettings {
         prefs.edit().putString("gamepad_input_mode", mode.name).apply()
         _gamepadInputMode.value = mode
     }
+
+    private val _gamepadInputModePrompted = MutableStateFlow(prefs.getBoolean("gamepad_input_mode_prompted", false))
+    /** 手柄输入模式是否已通过首次弹窗确认过（确认后不再自动弹窗） */
+    @JvmStatic
+    val gamepadInputModePrompted = _gamepadInputModePrompted.asStateFlow()
+
+    @JvmStatic
+    fun isGamepadInputModePrompted(): Boolean = _gamepadInputModePrompted.value
+
+    @JvmStatic
+    fun setGamepadInputModePrompted(value: Boolean) {
+        prefs.edit().putBoolean("gamepad_input_mode_prompted", value).apply()
+        _gamepadInputModePrompted.value = value
+    }
 }

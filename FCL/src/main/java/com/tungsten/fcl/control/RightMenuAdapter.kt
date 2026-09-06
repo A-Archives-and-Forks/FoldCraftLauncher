@@ -45,7 +45,7 @@ enum class RightMenuTag {
     MOUSE_OFFSET_X, MOUSE_OFFSET_Y, PHYSICAL_MOUSE,
 
     // 手柄
-    DISABLE_GAMEPAD_MAPPING, GAMEPAD_RESET_MAPPER, GAMEPAD_BUTTON_BINDING, GAMEPAD_DEADZONE,
+    GAMEPAD_CONTROL, GAMEPAD_RESET_MAPPER, GAMEPAD_BUTTON_BINDING, GAMEPAD_DEADZONE,
     GAMEPAD_INPUT_MODE,
 
     // 陀螺仪
@@ -251,9 +251,9 @@ class RightMenuAdapter(
 
         RightMenuCategory.GAMEPAD -> listOf(
             Row.SwitchRow(
-                R.string.menu_settings_gamepad_disable_mapping,
-                { gameMenu.isGamepadDisabled },
-                RightMenuTag.DISABLE_GAMEPAD_MAPPING
+                R.string.menu_settings_gamepad_control,
+                { gameMenu.isGamepadControl },
+                RightMenuTag.GAMEPAD_CONTROL
             ),
             Row.SpinnerRow(
                 R.string.menu_settings_gamepad_input_mode,
@@ -262,7 +262,8 @@ class RightMenuAdapter(
                     context.getString(R.string.menu_settings_gamepad_input_mode_sdl_direct)
                 ),
                 SdlSettings.gamepadInputMode.value.ordinal,
-                RightMenuTag.GAMEPAD_INPUT_MODE
+                RightMenuTag.GAMEPAD_INPUT_MODE,
+                enabled = gameMenu.isGamepadControl
             ),
             Row.ButtonRow(
                 R.string.menu_settings_gamepad_reset_mapper,
@@ -339,7 +340,8 @@ class RightMenuAdapter(
             val labelRes: Int,
             val data: List<String>,
             val selection: Int,
-            val tag: RightMenuTag
+            val tag: RightMenuTag,
+            val enabled: Boolean = true
         ) : Row()
 
         data class SeekBarRow(
@@ -447,6 +449,7 @@ class RightMenuAdapter(
         val spinner = binding.spinner as FCLSpinner<String>
         spinner.setItems(row.data)
         spinner.setSelection(row.selection)
+        spinner.isEnabled = row.enabled
         spinner.setOnItemSelectedListener { position, _ ->
             listener.onSpinnerSelect(row.tag, position)
         }
