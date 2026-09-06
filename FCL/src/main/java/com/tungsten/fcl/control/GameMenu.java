@@ -339,6 +339,8 @@ public class GameMenu implements MenuCallback, FCLBridgeCallback {
         });
         leftMenuList.setAdapter(leftMenuAdapter);
         leftMenuAdapter.rebuild();
+        leftMenuList.addItemDecoration(new SpacingDecoration(
+                Math.round(6 * activity.getResources().getDisplayMetrics().density)));
 
         getController().addListener(i -> leftMenuAdapter.rebuild());
         controllerProperty.addListener(invalidate -> {
@@ -392,6 +394,8 @@ public class GameMenu implements MenuCallback, FCLBridgeCallback {
         });
         rightMenuList.setAdapter(rightMenuAdapter);
         rightMenuAdapter.rebuild();
+        rightMenuList.addItemDecoration(new SpacingDecoration(
+                Math.round(6 * activity.getResources().getDisplayMetrics().density)));
 
         rightMenuTitle = findViewById(R.id.menu_title);
         rightMenuBack = findViewById(R.id.menu_back);

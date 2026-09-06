@@ -81,6 +81,7 @@ class RightMenuAdapter(
     private val menuSetting: MenuSetting get() = gameMenu.menuSetting
     private val screenWidth = getScreenWidth()
     private val screenHeight = getScreenHeight()
+    private val density = context.resources.displayMetrics.density
     private val multiplayerEnabled =
         context.getSharedPreferences("third_party", Context.MODE_PRIVATE)
             .getBoolean("terracotta", false)
@@ -383,8 +384,8 @@ class RightMenuAdapter(
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
         val row = rows[position]
-        // 菜单条目背景透明，露出抽屉背景
-        holder.itemView.background = null
+        // 条目卡片背景：以对话框背景为基准微亮，暗色下仅微亮避免刺眼（与 AnimationDialog 行样式一致）
+        holder.itemView.background = menuCardBackground(density)
         holder.itemView.findViewById<FCLTextView>(R.id.description)?.visibility = View.GONE
         when (row) {
             is Row.CategoryRow -> bindCategory(holder, row)
