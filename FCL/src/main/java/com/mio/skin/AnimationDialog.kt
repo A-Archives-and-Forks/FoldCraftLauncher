@@ -1,20 +1,15 @@
 package com.mio.skin
 
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.widget.LinearLayoutCompat
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
+import com.mio.ui.applySelectableItemStyle
 import com.mio.util.getScreenWidth
-import com.tungsten.fcl.R
 import com.tungsten.fcl.databinding.DialogAnimationSwitchBinding
 import com.tungsten.fcl.databinding.ItemAnimationBinding
 import com.tungsten.fcllibrary.component.dialog.FCLDialog
-import com.tungsten.fcllibrary.component.theme.ThemeEngine
 
 /** 动画选中回调（SAM 接口，便于 Java 侧 lambda 调用），参数为烘焙 clip 名 */
 fun interface OnAnimationSelectedListener {
@@ -31,7 +26,6 @@ class AnimationDialog(
 ) : FCLDialog(context) {
 
     private val binding = DialogAnimationSwitchBinding.inflate(layoutInflater)
-    private val themeColor = ThemeEngine.getInstance().getTheme().getColor()
     private val density = context.resources.displayMetrics.density
 
     init {
@@ -51,23 +45,8 @@ class AnimationDialog(
             onSelected.onSelected(clipId)
             dismiss()
         }
-        row.root.background = if (selected) {
-            // 当前动画：主题色圆角底 + 勾选图标
-            row.check.setColorFilter(themeColor)
-            row.check.visibility = View.VISIBLE
-            GradientDrawable().apply {
-                cornerRadius = 10 * density
-                setColor(ColorUtils.setAlphaComponent(themeColor, 30))
-            }
-        } else {
-            // 普通行：卡片色以对话框背景为基准（资源按亮暗模式解析），暗色下仅微亮避免刺眼
-            GradientDrawable().apply {
-                cornerRadius = 10 * density
-                val dialogColor = ContextCompat.getColor(context, R.color.dialog_background)
-                val blend = if (ThemeEngine.isNightMode(context)) 0.07f else 0.65f
-                setColor(ColorUtils.blendARGB(dialogColor, Color.WHITE, blend))
-            }
-        }
+        // 选中态统一样式：当前动画主题色底 + 勾选，其余普通卡片
+        applySelectableItemStyle(context, row.root, row.check, selected, density)
         return row.root
     }
 
